@@ -462,9 +462,14 @@ const Hero: FC = () => {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-50" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
           </span>
-          <span className="font-mono text-[11px] text-muted-foreground">
+          <a
+            href="https://x.com/hoodfolioapp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-[11px] text-muted-foreground transition-colors hover:text-brand"
+          >
             Coming soon · Follow us on 𝕏 for updates
-          </span>
+          </a>
         </motion.div>
       </div>
 
@@ -993,7 +998,7 @@ const Footer: FC = () => {
 
         <div className="flex items-center gap-5">
           <a
-            href="https://x.com"
+            href="https://x.com/hoodfolioapp"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
