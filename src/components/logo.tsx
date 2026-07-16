@@ -33,18 +33,17 @@ export const LogoMark: FC<LogoProps> = ({ size = 32, className = "" }) => (
     <rect x="8" y="7.5" width="2.4" height="17" rx="1.2" fill="currentColor" />
     {/* H right vertical bar */}
     <rect x="21.6" y="7.5" width="2.4" height="17" rx="1.2" fill="currentColor" />
-    {/* H horizontal crossbar */}
-    <rect x="10.4" y="15" width="8.5" height="2" rx="1" fill="currentColor" />
-    {/* Upward arrow from crossbar (chart motif) */}
+    {/* H crossbar — trading chart: starts at left bar, dips, breaks out to right bar */}
     <path
-      d="M18 16L22 10"
+      d="M10.4 15.5 L12.5 15.5 L14.5 16.5 L16.5 13 L18.5 13.5 L21.6 14.5"
       stroke="currentColor"
       strokeWidth="2.2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      fill="none"
     />
-    {/* Arrow tip at the end */}
-    <circle cx="22" cy="10" r="1.6" fill="currentColor" />
+    {/* Small candle dot at the breakout peak */}
+    <circle cx="16.5" cy="13" r="1.8" fill="currentColor" />
   </svg>
 );
 
