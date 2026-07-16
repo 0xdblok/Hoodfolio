@@ -7,7 +7,7 @@ import {
   useEffect,
   type FC,
 } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import {
   TrendingUp,
   TrendingDown,
@@ -20,23 +20,26 @@ import {
   Menu,
   X,
   ExternalLink,
-  HelpCircle,
+  Plus,
+  Sparkles,
+  Hexagon,
 } from "lucide-react";
+import { Logo, LogoMark } from "@/components/logo";
 
 /* ─────────────────────────────────────────────
    Data
    ──────────────────────────────────────────── */
 
 const ASSETS = [
-  { ticker: "AAPL", name: "Apple Inc.", change: 2.34 },
-  { ticker: "NVDA", name: "NVIDIA Corp", change: 4.71 },
-  { ticker: "TSLA", name: "Tesla Inc.", change: -1.22 },
-  { ticker: "BTC", name: "Bitcoin", change: 0.89 },
-  { ticker: "ETH", name: "Ethereum", change: 3.15 },
+  { ticker: "AAPL", name: "Apple", change: 2.34, weight: 25 },
+  { ticker: "NVDA", name: "NVIDIA", change: 4.71, weight: 30 },
+  { ticker: "TSLA", name: "Tesla", change: -1.22, weight: 15 },
+  { ticker: "BTC", name: "Bitcoin", change: 0.89, weight: 20 },
+  { ticker: "ETH", name: "Ethereum", change: 3.15, weight: 10 },
 ] as const;
 
 const LEADERBOARD_PREVIEW = [
-  { rank: 1, name: "CryptoKing", score: 14230, change: 8.4 },
+  { rank: 1, name: "0xTrader", score: 14230, change: 8.4 },
   { rank: 2, name: "StockWhisperer", score: 13890, change: 5.2 },
   { rank: 3, name: "AlphaSeeker", score: 13560, change: -1.8 },
   { rank: 4, name: "NakamotoFan", score: 13120, change: 12.1 },
@@ -44,78 +47,151 @@ const LEADERBOARD_PREVIEW = [
 ];
 
 const COMPETITIONS = [
-  { type: "Daily", time: "Today 9:30 AM ET", prize: "500 DOL", participants: 247, status: "live" },
-  { type: "Daily", time: "Tomorrow 9:30 AM ET", prize: "500 DOL", participants: 189, status: "upcoming" },
-  { type: "Weekly", time: "Monday 9:30 AM ET", prize: "2,500 DOL", participants: 412, status: "upcoming" },
+  {
+    type: "Daily",
+    time: "Today 9:30 AM ET",
+    prize: "500 DOL",
+    participants: 247,
+    status: "live",
+  },
+  {
+    type: "Daily",
+    time: "Tomorrow 9:30 AM ET",
+    prize: "500 DOL",
+    participants: 189,
+    status: "upcoming",
+  },
+  {
+    type: "Weekly",
+    time: "Monday 9:30 AM ET",
+    prize: "2,500 DOL",
+    participants: 412,
+    status: "upcoming",
+  },
 ] as const;
 
 const FAQS = [
   {
     q: "What is Hoodfolio?",
-    a: "Hoodfolio is a fantasy stock token trading game. You build a portfolio of five assets and compete against other players in daily and weekly competitions based on real market performance.",
+    a: "Hoodfolio is a fantasy stock token trading game. You build a portfolio of five assets and compete against other players in daily and weekly competitions based on real market performance. Think Fantasy Premier League meets the stock market.",
   },
   {
     q: "Is it free to play?",
-    a: "Yes — completely free during the MVP. You'll use simulated portfolios with virtual currency. No real money, no wallet required.",
+    a: "Completely free during the MVP. You'll use simulated portfolios with virtual currency called DOL. No real money, no wallet required — just sign up and start competing.",
   },
   {
-    q: "How do I win?",
-    a: "Your portfolio's performance is ranked against other players. The top portfolios at the end of each competition earn rewards and climb the leaderboard.",
+    q: "How do competitions work?",
+    a: "Daily competitions start every morning at 9:30 AM ET. Weekly championships kick off every Monday. Your portfolio's performance is ranked against all other players — top performers earn rewards and climb the global leaderboard.",
   },
   {
     q: "What assets can I pick?",
-    a: "You can choose from a curated set of stocks, crypto, and tokenized assets. The initial MVP focuses on major stocks and cryptocurrencies.",
+    a: "The MVP features a curated set of major stocks and cryptocurrencies. You pick exactly five assets per portfolio. As the platform grows, more assets — including Robinhood Stock Tokens — will be added.",
   },
   {
     q: "What is Robinhood Chain?",
-    a: "Robinhood Chain is an emerging blockchain ecosystem that enables tokenized stock trading with near-instant settlement. Hoodfolio is built to showcase what's possible on this infrastructure.",
+    a: "Robinhood Chain is an emerging blockchain ecosystem that enables tokenized stock trading with near-instant settlement and near-zero fees. Hoodfolio is designed to showcase what competitive social trading looks like on this infrastructure.",
   },
   {
     q: "Do I need a crypto wallet?",
-    a: "Not during the MVP. Simulated portfolios mean you can play immediately without any setup. Wallet integration will be added when real tokenized assets become available.",
+    a: "Not during the MVP. Simulated portfolios mean you can play immediately. Wallet integration and real tokenized assets will be introduced when the Robinhood Chain ecosystem matures.",
+  },
+  {
+    q: "When is the launch?",
+    a: "We're in active development. The MVP is targeted for release soon. Join the waitlist to get early access and secure your spot in the first competitions.",
+  },
+];
+
+const ROBINHOOD_CHAIN = [
+  {
+    label: "Settlement",
+    value: "Sub-second",
+    desc: "Tokenized assets settle near-instantly on Robinhood Chain. Competitions resolve the moment markets close — no T+2 delays.",
+  },
+  {
+    label: "Cost",
+    value: "Near-zero fees",
+    desc: "On-chain execution eliminates layers of intermediaries. More of every competition's prize pool goes directly to players.",
+  },
+  {
+    label: "Verifiability",
+    value: "Fully on-chain",
+    desc: "Every portfolio, every trade, every leaderboard position is cryptographically verifiable. No hidden mechanics, no trust required.",
+  },
+  {
+    label: "Access",
+    value: "Permissionless",
+    desc: "Anyone with an internet connection can participate. No broker account, no geographic restrictions, no minimum balance.",
   },
 ];
 
 /* ─────────────────────────────────────────────
-   Components
+   Shared micro-components
    ──────────────────────────────────────────── */
 
-/* ── Nav ── */
+const ComingSoonBadge: FC = () => (
+  <span className="inline-flex items-center gap-1.5 rounded-full border border-brand/30 bg-brand/5 px-3 py-1 font-mono text-[10px] font-medium text-brand-light uppercase tracking-[0.08em]">
+    <Sparkles size={10} />
+    Coming soon
+  </span>
+);
+
+const SimulatedLabel: FC = () => (
+  <span className="inline-flex items-center gap-1 rounded-md border border-border/20 bg-card/50 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+    <Hexagon size={9} />
+    Simulated data
+  </span>
+);
+
+/* ─────────────────────────────────────────────
+   Nav
+   ──────────────────────────────────────────── */
+
 const Nav: FC = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border/30 bg-background/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-border/20 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <a href="#" className="flex items-center gap-2 font-heading text-lg font-bold tracking-tight">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-brand-foreground font-mono text-sm font-bold">
-            H
-          </span>
-          Hoodfolio
+        <a href="#" className="flex items-center">
+          <Logo className="text-lg" />
         </a>
 
-        {/* Desktop links */}
         <div className="hidden items-center gap-8 md:flex">
-          <a href="#how-it-works" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+          <a
+            href="#how-it-works"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
             How it works
           </a>
-          <a href="#competitions" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+          <a
+            href="#competitions"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
             Competitions
           </a>
-          <a href="#faq" className="text-sm text-muted-foreground transition-colors hover:text-foreground">
+          <a
+            href="#leaderboard"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Leaderboard
+          </a>
+          <a
+            href="#faq"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
             FAQ
           </a>
           <a
-            href="#cta"
-            className="inline-flex h-9 items-center rounded-full border border-brand px-5 text-sm font-medium text-brand transition-all hover:bg-brand hover:text-brand-foreground"
+            href="#waitlist"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-brand px-5 text-[13px] font-semibold text-brand-foreground transition-all hover:bg-brand-dim"
           >
-            Join the beta
+            Join waitlist
+            <ArrowRight size={14} />
           </a>
         </div>
 
-        {/* Mobile toggle */}
         <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/40 md:hidden"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border/30 md:hidden"
           onClick={() => setOpen(!open)}
           aria-label={open ? "Close menu" : "Open menu"}
         >
@@ -123,12 +199,11 @@ const Nav: FC = () => {
         </button>
       </div>
 
-      {/* Mobile drawer */}
       {open && (
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="border-b border-border/30 bg-background/95 backdrop-blur-xl md:hidden"
+          className="border-b border-border/20 bg-background/95 backdrop-blur-xl md:hidden"
         >
           <div className="flex flex-col gap-3 px-6 py-5">
             <a
@@ -146,6 +221,13 @@ const Nav: FC = () => {
               Competitions
             </a>
             <a
+              href="#leaderboard"
+              className="text-sm text-muted-foreground"
+              onClick={() => setOpen(false)}
+            >
+              Leaderboard
+            </a>
+            <a
               href="#faq"
               className="text-sm text-muted-foreground"
               onClick={() => setOpen(false)}
@@ -153,11 +235,12 @@ const Nav: FC = () => {
               FAQ
             </a>
             <a
-              href="#cta"
-              className="mt-1 inline-flex h-9 w-fit items-center rounded-full border border-brand px-5 text-sm font-medium text-brand"
+              href="#waitlist"
+              className="mt-1 inline-flex h-9 w-fit items-center gap-1.5 rounded-full bg-brand px-5 text-sm font-semibold text-brand-foreground"
               onClick={() => setOpen(false)}
             >
-              Join the beta
+              Join waitlist
+              <ArrowRight size={14} />
             </a>
           </div>
         </motion.div>
@@ -166,22 +249,22 @@ const Nav: FC = () => {
   );
 };
 
-/* ── Asset Card (Hero) ── */
+/* ─────────────────────────────────────────────
+   Asset Card (Hero) — improved
+   ──────────────────────────────────────────── */
+
 const AssetCard: FC<{
   ticker: string;
   name: string;
   change: number;
-  index: number;
   mouseX: number;
   mouseY: number;
-}> = ({ ticker, name, change, index, mouseX, mouseY }) => {
+}> = ({ ticker, name, change, mouseX, mouseY }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-
-  const springX = useSpring(x, { stiffness: 100, damping: 20 });
-  const springY = useSpring(y, { stiffness: 100, damping: 20 });
+  const springX = useSpring(x, { stiffness: 120, damping: 22 });
+  const springY = useSpring(y, { stiffness: 120, damping: 22 });
 
   useEffect(() => {
     if (!cardRef.current) return;
@@ -191,10 +274,10 @@ const AssetCard: FC<{
     const dx = mouseX - cx;
     const dy = mouseY - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    const maxDist = 300;
+    const maxDist = 350;
     const force = Math.max(0, 1 - dist / maxDist);
-    x.set(dx * force * 0.04);
-    y.set(dy * force * 0.04);
+    x.set(dx * force * 0.05);
+    y.set(dy * force * 0.05);
   }, [mouseX, mouseY, x, y]);
 
   const isPositive = change >= 0;
@@ -203,30 +286,29 @@ const AssetCard: FC<{
     <motion.div
       ref={cardRef}
       style={{ x: springX, y: springY }}
-      className="relative flex flex-col gap-1.5 rounded-xl border border-border/30 bg-card/70 px-4 py-3 backdrop-blur-sm select-none"
-      whileHover={{ scale: 1.03 }}
+      className="relative flex flex-col gap-2 rounded-xl border border-border/20 bg-card/80 px-4 py-3.5 backdrop-blur-sm select-none"
+      whileHover={{ scale: 1.04 }}
     >
+      {/* Top row: ticker + change */}
       <div className="flex items-center justify-between">
-        <span className="font-mono text-sm font-semibold tracking-tight">
-          {ticker}
+        <span className="font-mono text-sm font-bold tracking-tight">
+          ${ticker}
         </span>
         <span
-          className={`flex items-center gap-0.5 font-mono text-xs font-medium ${
+          className={`flex items-center gap-1 font-mono text-xs font-semibold ${
             isPositive ? "text-positive" : "text-negative"
           }`}
         >
-          {isPositive ? (
-            <TrendingUp size={12} />
-          ) : (
-            <TrendingDown size={12} />
-          )}
+          {isPositive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
           {isPositive ? "+" : ""}
           {change.toFixed(2)}%
         </span>
       </div>
-      <span className="text-xs text-muted-foreground">{name}</span>
+      {/* Name */}
+      <span className="text-[11px] text-muted-foreground">{name}</span>
+      {/* Subtle glow */}
       <div
-        className={`absolute inset-0 -z-10 rounded-xl opacity-[0.06] transition-opacity ${
+        className={`pointer-events-none absolute inset-0 rounded-xl opacity-[0.04] ${
           isPositive ? "bg-positive" : "bg-negative"
         }`}
       />
@@ -234,28 +316,38 @@ const AssetCard: FC<{
   );
 };
 
-/* ── Hero (OVERDRIVE) ── */
+/* ─────────────────────────────────────────────
+   Hero — OVERDRIVE
+   ──────────────────────────────────────────── */
+
 const Hero: FC = () => {
   const [mouseX, setMouseX] = useState(0);
   const [mouseY, setMouseY] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      setMouseX(e.clientX);
-      setMouseY(e.clientY);
-    },
-    []
-  );
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    setMouseX(e.clientX);
+    setMouseY(e.clientY);
+  }, []);
 
   return (
     <section
       ref={heroRef}
       onMouseMove={handleMouseMove}
-      className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-6 pt-24 pb-20"
+      className="relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 pt-24 pb-20"
     >
-      {/* Ambient glow behind the cards */}
-      <div className="pointer-events-none absolute top-1/2 left-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-[120px]" />
+      {/* Ambient brand glow */}
+      <div className="pointer-events-none absolute top-1/3 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-[140px]" />
+
+      {/* Logo mark — large, subtle */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.06 }}
+        transition={{ duration: 1.2 }}
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      >
+        <LogoMark size={400} className="text-brand" />
+      </motion.div>
 
       {/* Headline */}
       <div className="relative z-10 text-center">
@@ -263,7 +355,7 @@ const Hero: FC = () => {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="text-balance font-heading text-[clamp(2.2rem,6vw,5.5rem)] leading-[1.06] font-bold tracking-[-0.025em]"
+          className="text-balance font-heading text-[clamp(2.2rem,6vw,5.5rem)] leading-[1.05] font-bold tracking-[-0.025em]"
         >
           Your portfolio.
           <br />
@@ -276,19 +368,19 @@ const Hero: FC = () => {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-          className="mt-6 text-balance text-lg text-muted-foreground"
+          className="mt-6 max-w-xl text-balance text-base text-muted-foreground md:text-lg"
         >
-          Build a portfolio of 5 assets.
-          <br className="sm:hidden" /> Compete daily and weekly.
-          <br className="sm:hidden" /> Climb the ranks.
+          Pick five assets. Compete in daily and weekly tournaments.
+          <br />
+          No real money — just skill, strategy, and the leaderboard.
         </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-          className="mt-2 font-mono text-xs text-muted-foreground/60"
+          className="mt-3 font-mono text-xs text-muted-foreground/50"
         >
-          Simulated portfolios — no real money, no wallet required.
+          Simulated portfolios · Free to play · Built for Robinhood Chain
         </motion.p>
 
         {/* CTAs */}
@@ -299,33 +391,36 @@ const Hero: FC = () => {
           className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
         >
           <a
-            href="#cta"
-            className="inline-flex h-12 items-center gap-2 rounded-full bg-brand px-8 text-[15px] font-semibold text-brand-foreground transition-all hover:bg-brand-dim"
+            href="#waitlist"
+            className="group inline-flex h-12 items-center gap-2 rounded-full bg-brand px-8 text-[15px] font-semibold text-brand-foreground transition-all hover:bg-brand-dim hover:shadow-[0_0_32px_rgba(0,200,100,0.15)]"
           >
-            Start playing
-            <span className="font-normal opacity-70">— It&apos;s free</span>
+            Join the waitlist
+            <ArrowRight
+              size={16}
+              className="transition-transform group-hover:translate-x-0.5"
+            />
           </a>
           <a
-            href="#competitions"
-            className="inline-flex h-12 items-center gap-2 rounded-full border border-border/40 px-8 text-[15px] font-medium text-foreground transition-all hover:border-foreground/30 hover:bg-foreground/[0.03]"
+            href="#how-it-works"
+            className="inline-flex h-12 items-center gap-2 rounded-full border border-border/30 px-8 text-[15px] font-medium text-foreground transition-all hover:border-foreground/20 hover:bg-foreground/[0.03]"
           >
-            Watch a live competition
+            How it works
           </a>
         </motion.div>
 
-        {/* Live indicator */}
+        {/* Live pulse indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-6 flex items-center justify-center gap-2"
+          transition={{ delay: 0.5 }}
+          className="mt-7 flex items-center justify-center gap-2"
         >
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-60" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-50" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
           </span>
-          <span className="font-mono text-xs text-muted-foreground">
-            247 traders competing right now
+          <span className="font-mono text-[11px] text-muted-foreground">
+            MVP in development · Early access opening soon
           </span>
         </motion.div>
       </div>
@@ -335,19 +430,39 @@ const Hero: FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.4 }}
-        className="relative z-10 mt-16 grid w-full max-w-4xl grid-cols-2 gap-3 sm:grid-cols-5 md:gap-4"
+        className="relative z-10 mt-16 grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-5 md:gap-4"
       >
-        {ASSETS.map((asset, i) => (
+        {ASSETS.map((asset) => (
           <AssetCard
             key={asset.ticker}
             ticker={asset.ticker}
             name={asset.name}
             change={asset.change}
-            index={i}
             mouseX={mouseX}
             mouseY={mouseY}
           />
         ))}
+      </motion.div>
+
+      {/* Portfolio weight indicators */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="relative z-10 mt-4 flex items-center gap-3"
+      >
+        <span className="font-mono text-[10px] text-muted-foreground/50">
+          Example portfolio weights
+        </span>
+        <div className="flex h-1.5 w-48 overflow-hidden rounded-full bg-muted">
+          {ASSETS.map((a) => (
+            <div
+              key={a.ticker}
+              className="h-full bg-brand/40 first:rounded-l-full last:rounded-r-full"
+              style={{ width: `${a.weight}%` }}
+            />
+          ))}
+        </div>
       </motion.div>
 
       {/* Scroll hint */}
@@ -361,280 +476,187 @@ const Hero: FC = () => {
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <ChevronDown
-            size={20}
-            className="text-muted-foreground/30"
-          />
+          <ChevronDown size={18} className="text-muted-foreground/20" />
         </motion.div>
       </motion.div>
     </section>
   );
 };
 
-/* ── Section 2: Contrast ── */
-const Contrast: FC = () => {
+/* ─────────────────────────────────────────────
+   Section 2: Social differentiation
+   ──────────────────────────────────────────── */
+
+const WhyDifferent: FC = () => {
   return (
-    <section className="relative px-6 py-24 md:py-32">
+    <section id="how-it-works" className="relative px-6 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
+        <div className="mb-4">
+          <ComingSoonBadge />
+        </div>
         <h2 className="text-balance font-heading text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
-          Most trading platforms
+          Trading is better
           <br />
-          are lonely.
-          <br />
-          <span className="text-brand">This one isn&apos;t.</span>
+          <span className="text-brand">with an audience.</span>
         </h2>
 
-        <div className="mt-16 grid gap-12 md:grid-cols-[3fr_2fr] md:gap-16">
-          {/* Left: Three intensity lines */}
-          <div className="flex flex-col gap-8">
+        <div className="mt-16 grid gap-1 md:grid-cols-2">
+          {/* Left column: three value props */}
+          <div className="flex flex-col gap-1">
             {[
               {
-                step: "Pick five assets. Any five.",
-                desc: "Apple. Bitcoin. Tesla. NVIDIA. Ethereum. Curate your portfolio from stocks and crypto — no real money needed.",
-                accent: "bg-brand/10 text-brand border-brand/20",
+                icon: <Plus size={20} />,
+                title: "Pick five. No more, no less.",
+                desc: "Curate a portfolio of exactly five assets from stocks and crypto. Constraints create strategy — the five you don't pick matter as much as the five you do.",
+                border: "border-brand/20 bg-brand/[0.03]",
+                text: "text-brand-light",
               },
               {
-                step: "Your picks compete against everyone else's.",
-                desc: "Every portfolio enters the same daily and weekly competitions. Your choices go head-to-head with the entire player base.",
-                accent: "bg-amber/10 text-amber border-amber/20",
+                icon: <Users size={20} />,
+                title: "Compete against everyone.",
+                desc: "Every portfolio enters the same pool. Daily competitions, weekly championships. Your picks go head-to-head with every other player in real time.",
+                border: "border-gold/20 bg-gold/[0.03]",
+                text: "text-gold",
               },
               {
-                step: "Win daily. Win weekly. No entry fee, just skill.",
-                desc: "The top portfolios rise. Real market data drives real outcomes. Performance is the only thing that matters.",
-                accent: "bg-positive/10 text-positive border-positive/20",
+                icon: <Trophy size={20} />,
+                title: "The leaderboard doesn't lie.",
+                desc: "Market performance drives outcomes. No judges, no voting, no subjectivity. If your five outperform, you climb — pure merit.",
+                border: "border-positive/20 bg-positive/[0.03]",
+                text: "text-positive",
               },
             ].map((item, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, x: -16 }}
+                initial={{ opacity: 0, x: -12 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`flex flex-col gap-2 rounded-2xl border p-6 ${item.accent}`}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.4, delay: i * 0.08 }}
+                className={`flex gap-4 rounded-xl border p-5 ${item.border}`}
               >
-                <span className="font-heading text-lg font-semibold">
-                  {item.step}
-                </span>
-                <span className="text-sm opacity-80">{item.desc}</span>
+                <div className={`mt-0.5 shrink-0 ${item.text}`}>
+                  {item.icon}
+                </div>
+                <div>
+                  <h3 className="text-[15px] font-semibold">{item.title}</h3>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+                    {item.desc}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Right: Portfolio visual */}
-          <div className="flex items-center justify-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="relative"
-            >
-              <div className="flex h-[280px] w-[280px] items-center justify-center rounded-full border border-border/20 bg-card/40 md:h-[320px] md:w-[320px]">
-                {["AAPL", "NVDA", "TSLA", "BTC", "ETH"].map((ticker, i) => {
-                  const angle = (i / 5) * 360 - 90;
-                  const rad = (angle * Math.PI) / 180;
-                  const r = 100;
-                  const x = Math.cos(rad) * r;
-                  const y = Math.sin(rad) * r;
-                  return (
-                    <span
-                      key={ticker}
-                      className="absolute font-mono text-xs font-semibold text-brand"
-                      style={{
-                        transform: `translate(${x}px, ${y}px)`,
-                      }}
-                    >
-                      {ticker}
-                    </span>
-                  );
-                })}
+          {/* Right column: visual */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center justify-center p-8"
+          >
+            <div className="relative flex h-[280px] w-[280px] items-center justify-center md:h-[340px] md:w-[340px]">
+              {/* Outer ring */}
+              <div className="absolute inset-0 rounded-full border border-brand/15" />
+              <div className="absolute inset-2 rounded-full border border-brand/8" />
+              {/* Inner glow */}
+              <div className="absolute inset-8 rounded-full bg-brand/[0.03] blur-2xl" />
+              {/* Asset positions on ring */}
+              {ASSETS.map((a, i) => {
+                const angle = (i / ASSETS.length) * 360 - 90;
+                const rad = (angle * Math.PI) / 180;
+                const r = 115;
+                const x = Math.cos(rad) * r;
+                const y = Math.sin(rad) * r;
+                return (
+                  <span
+                    key={a.ticker}
+                    className="absolute font-mono text-xs font-bold text-brand"
+                    style={{ transform: `translate(${x}px, ${y}px)` }}
+                  >
+                    ${a.ticker}
+                  </span>
+                );
+              })}
+              {/* Center: logo + percentage */}
+              <div className="z-10 flex flex-col items-center gap-1">
+                <LogoMark size={40} className="text-brand" />
                 <span className="font-mono text-sm font-bold text-foreground">
                   100%
                 </span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  5 assets
+                </span>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   Competitions Timeline
+   ──────────────────────────────────────────── */
+
+const CompetitionsTimeline: FC = () => {
+  return (
+    <section id="competitions" className="px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-5xl">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-3">
+              <ComingSoonBadge />
+            </div>
+            <h2 className="text-balance font-heading text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
+              Competitions
+              <br />
+              <span className="text-brand">every day.</span>
+            </h2>
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="mt-24">
-          <h3 className="font-heading text-xl font-semibold">
-            Daily competitions. Real stakes, simulated money.
-          </h3>
-          <div className="mt-8 flex flex-wrap gap-3">
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => (
+        {/* Timeline row */}
+        <div className="mt-12 flex flex-wrap gap-2">
+          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day, i) => {
+            const isToday = i === 3; // Thursday
+            const isPast = i < 3;
+            return (
               <div
                 key={day}
-                className={`flex h-14 flex-1 min-w-[60px] items-center justify-center rounded-xl border text-sm font-medium ${
-                  i === 3
+                className={`flex h-12 min-w-[56px] flex-1 items-center justify-center rounded-lg border text-xs font-medium ${
+                  isToday
                     ? "border-brand bg-brand/10 text-brand"
-                    : i < 3
-                      ? "border-border/10 bg-card/30 text-muted-foreground"
-                      : "border-border/15 bg-card/20 text-muted-foreground/70"
+                    : isPast
+                      ? "border-border/10 bg-card/20 text-muted-foreground/50"
+                      : "border-border/10 bg-card/20 text-muted-foreground/70"
                 }`}
               >
                 {day}
               </div>
-            ))}
-          </div>
-          <p className="mt-4 text-sm text-muted-foreground">
-            New competition every day at 9:30 AM ET. Weekly championships every
-            Monday.
-          </p>
+            );
+          })}
         </div>
-
-        {/* Mini-leaderboard */}
-        <div className="mt-16">
-          <h3 className="font-heading text-xl font-semibold">
-            Your rank updates live.
-          </h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            This is what your Sunday evening looks like.{" "}
-            <span className="text-muted-foreground/50">
-              (Preview — simulated data)
-            </span>
-          </p>
-
-          <div className="mt-6 overflow-x-auto">
-            <table className="w-full min-w-[500px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-border/20 text-xs uppercase tracking-[0.05em] text-muted-foreground">
-                  <th className="pb-3 font-medium">Rank</th>
-                  <th className="pb-3 font-medium">Player</th>
-                  <th className="pb-3 text-right font-medium">Score</th>
-                  <th className="pb-3 text-right font-medium">Change</th>
-                </tr>
-              </thead>
-              <tbody>
-                {LEADERBOARD_PREVIEW.map((p) => (
-                  <tr
-                    key={p.name}
-                    className="border-b border-border/10 transition-colors hover:bg-foreground/[0.02]"
-                  >
-                    <td className="py-3">
-                      <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded font-mono text-xs font-bold ${
-                          p.rank === 1
-                            ? "bg-amber text-background"
-                            : p.rank === 2
-                              ? "bg-foreground/20 text-foreground"
-                              : p.rank === 3
-                                ? "bg-amber/30 text-amber"
-                                : "text-muted-foreground"
-                        }`}
-                      >
-                        {p.rank}
-                      </span>
-                    </td>
-                    <td className="py-3 font-medium">{p.name}</td>
-                    <td className="py-3 text-right font-mono">
-                      {p.score.toLocaleString()}
-                    </td>
-                    <td
-                      className={`py-3 text-right font-mono ${
-                        p.change >= 0 ? "text-positive" : "text-negative"
-                      }`}
-                    >
-                      {p.change >= 0 ? "+" : ""}
-                      {p.change}%
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/* ── How It Works ── */
-const HowItWorks: FC = () => {
-  return (
-    <section id="how-it-works" className="px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-5xl">
-        <h2 className="text-balance font-heading text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
-          Three steps.
-          <br />
-          <span className="text-brand">That&apos;s it.</span>
-        </h2>
-
-        <div className="mt-16 flex flex-col gap-6 md:flex-row">
-          {[
-            {
-              icon: <Zap size={24} />,
-              title: "Pick 5 assets",
-              desc: "Choose from stocks, crypto, and tokenized assets. Build your portfolio in under a minute.",
-            },
-            {
-              icon: <Users size={24} />,
-              title: "Enter a competition",
-              desc: "Join a daily or weekly competition. Everyone competes with the same market data.",
-            },
-            {
-              icon: <Trophy size={24} />,
-              title: "Climb the ranks",
-              desc: "Watch your portfolio compete in real time. Top performers win and earn rewards.",
-            },
-          ].map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="relative flex flex-1 flex-col gap-4 rounded-2xl border border-border/15 bg-card/30 p-6 pt-14"
-            >
-              <div className="absolute top-5 left-5 flex h-9 w-9 items-center justify-center rounded-lg bg-brand/10 text-brand">
-                {step.icon}
-              </div>
-              <span className="font-heading text-lg font-semibold">
-                {step.title}
-              </span>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                {step.desc}
-              </p>
-
-              {/* Connector line between steps (desktop only) */}
-              {i < 2 && (
-                <div className="absolute top-1/2 -right-3 hidden h-px w-6 bg-border/20 md:block" />
-              )}
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/* ── Competitions ── */
-const Competitions: FC = () => {
-  return (
-    <section id="competitions" className="px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-5xl">
-        <h2 className="text-balance font-heading text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
-          Competitions
-          <br />
-          <span className="text-brand">ready for you.</span>
-        </h2>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Prizes are simulated and for demonstration during the MVP.
+        <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+          New competition daily at 9:30 AM ET · Weekly championships every
+          Monday
         </p>
 
-        <div className="mt-12 flex flex-col gap-4">
+        {/* Competition cards */}
+        <div className="mt-10 flex flex-col gap-3">
           {COMPETITIONS.map((comp, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/15 bg-card/30 p-6"
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.35, delay: i * 0.08 }}
+              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border/15 bg-card/40 px-5 py-4"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <span
-                  className={`inline-flex h-10 w-10 items-center justify-center rounded-xl font-mono text-xs font-bold ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg font-mono text-[10px] font-bold ${
                     comp.status === "live"
                       ? "bg-brand/15 text-brand"
                       : "bg-muted text-muted-foreground"
@@ -643,21 +665,33 @@ const Competitions: FC = () => {
                   {comp.status === "live" ? "●" : "○"}
                 </span>
                 <div>
-                  <span className="font-heading font-semibold">
-                    {comp.type} Competition
-                  </span>
-                  <p className="text-sm text-muted-foreground">{comp.time}</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold">
+                      {comp.type}
+                    </span>
+                    {comp.status === "live" && (
+                      <span className="rounded-full bg-brand/10 px-2 py-0.5 font-mono text-[10px] text-brand">
+                        LIVE
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[12px] text-muted-foreground">
+                    {comp.time}
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 font-mono text-sm">
-                  <Trophy size={15} className="text-amber" />
-                  <span className="text-amber">{comp.prize}</span>
+              <div className="flex items-center gap-5">
+                <div className="flex items-center gap-1.5 font-mono text-sm">
+                  <Trophy size={14} className="text-gold" />
+                  <span className="text-gold font-semibold">{comp.prize}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Users size={15} />
+                <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                  <Users size={14} />
                   <span>{comp.participants} joined</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <SimulatedLabel />
                 </div>
               </div>
             </motion.div>
@@ -668,7 +702,101 @@ const Competitions: FC = () => {
   );
 };
 
-/* ── Why Robinhood Chain ── */
+/* ─────────────────────────────────────────────
+   Leaderboard
+   ──────────────────────────────────────────── */
+
+const LeaderboardSection: FC = () => {
+  return (
+    <section id="leaderboard" className="px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-3">
+          <SimulatedLabel />
+        </div>
+        <h2 className="text-balance font-heading text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
+          This is what
+          <br />
+          <span className="text-brand">Sunday evening</span> looks like.
+        </h2>
+
+        <div className="mt-10 overflow-x-auto rounded-xl border border-border/15 bg-card/30">
+          <table className="w-full min-w-[480px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-border/15">
+                <th className="px-5 py-3 font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                  Rank
+                </th>
+                <th className="px-5 py-3 font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                  Player
+                </th>
+                <th className="px-5 py-3 text-right font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                  Score
+                </th>
+                <th className="px-5 py-3 text-right font-mono text-[10px] font-medium tracking-[0.08em] text-muted-foreground uppercase">
+                  24h Δ
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {LEADERBOARD_PREVIEW.map((p) => (
+                <tr
+                  key={p.name}
+                  className="border-b border-border/10 transition-colors hover:bg-foreground/[0.02]"
+                >
+                  <td className="px-5 py-3.5">
+                    <span
+                      className={`inline-flex h-6 w-6 items-center justify-center rounded font-mono text-[11px] font-bold ${
+                        p.rank === 1
+                          ? "bg-gold text-background"
+                          : p.rank === 2
+                            ? "bg-foreground/15 text-foreground"
+                            : p.rank === 3
+                              ? "bg-gold/30 text-gold"
+                              : "text-muted-foreground"
+                      }`}
+                    >
+                      {p.rank}
+                    </span>
+                  </td>
+                  <td className="px-5 py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={`flex h-7 w-7 items-center justify-center rounded-full text-[10px] font-bold ${
+                          p.rank <= 3
+                            ? "bg-brand/10 text-brand"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {p.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <span className="font-medium">{p.name}</span>
+                    </div>
+                  </td>
+                  <td className="px-5 py-3.5 text-right font-mono font-semibold tabular-nums">
+                    {p.score.toLocaleString()}
+                  </td>
+                  <td
+                    className={`px-5 py-3.5 text-right font-mono text-xs font-semibold tabular-nums ${
+                      p.change >= 0 ? "text-positive" : "text-negative"
+                    }`}
+                  >
+                    {p.change >= 0 ? "+" : ""}
+                    {p.change}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   Robinhood Chain
+   ──────────────────────────────────────────── */
+
 const WhyRHChain: FC = () => {
   return (
     <section className="px-6 py-24 md:py-32">
@@ -678,46 +806,23 @@ const WhyRHChain: FC = () => {
           <br />
           <span className="text-brand">Robinhood Chain.</span>
         </h2>
-        <p className="mt-3 text-sm text-muted-foreground">
+        <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
           Hoodfolio is designed to showcase what tokenized stock trading makes
-          possible. The MVP runs with simulated portfolios — Robinhood Chain
-          integration is the target ecosystem.
+          possible — competitive, social, and verifiable. The MVP runs with
+          simulated portfolios; Robinhood Chain integration is the target
+          ecosystem.
         </p>
 
-        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-border/15 bg-border/10 md:grid-cols-2">
-          {[
-            {
-              label: "Settlement speed",
-              value: "Near-instant",
-              desc: "Tokenized assets settle in seconds, not days. Competitions resolve immediately.",
-            },
-            {
-              label: "Cost",
-              value: "Fraction of traditional",
-              desc: "On-chain execution eliminates intermediary fees. More value stays in the game.",
-            },
-            {
-              label: "Transparency",
-              value: "Fully on-chain",
-              desc: "Every trade, every score, every leaderboard position is verifiable on-chain.",
-            },
-            {
-              label: "Access",
-              value: "Permissionless",
-              desc: "Anyone can participate. No broker account needed for tokenized assets.",
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="flex flex-col gap-1.5 bg-card/30 p-6"
-            >
-              <span className="text-xs text-muted-foreground">
+        <div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-border/15 bg-border/5 sm:grid-cols-2">
+          {ROBINHOOD_CHAIN.map((item, i) => (
+            <div key={i} className="flex flex-col gap-1.5 bg-card/30 px-5 py-5">
+              <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-[0.06em]">
                 {item.label}
               </span>
-              <span className="font-heading text-lg font-semibold">
+              <span className="font-heading text-base font-semibold">
                 {item.value}
               </span>
-              <span className="text-sm leading-relaxed text-muted-foreground">
+              <span className="text-[13px] leading-relaxed text-muted-foreground">
                 {item.desc}
               </span>
             </div>
@@ -728,31 +833,33 @@ const WhyRHChain: FC = () => {
   );
 };
 
-/* ── FAQ ── */
+/* ─────────────────────────────────────────────
+   FAQ
+   ──────────────────────────────────────────── */
+
 const FAQ: FC = () => {
   return (
     <section id="faq" className="px-6 py-24 md:py-32">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-2xl">
         <h2 className="font-heading text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
-          Questions
+          You probably
           <br />
-          <span className="text-brand">you might have.</span>
+          <span className="text-brand">have questions.</span>
         </h2>
 
-        <div className="mt-12 flex flex-col gap-1">
+        <div className="mt-10 flex flex-col gap-1">
           {FAQS.map((faq, i) => (
             <details
               key={i}
-              className="group rounded-xl border border-border/15 bg-card/30 transition-colors hover:bg-card/50"
+              className="group rounded-xl border border-border/15 bg-card/25 transition-colors hover:bg-card/40"
             >
-              <summary className="flex cursor-pointer items-center justify-between p-5 font-medium list-none">
-                <span className="pr-4 text-[15px]">{faq.q}</span>
-                <HelpCircle
-                  size={16}
-                  className="shrink-0 text-muted-foreground transition-transform group-open:rotate-45"
-                />
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 text-[14px] font-medium list-none">
+                <span className="pr-4">{faq.q}</span>
+                <span className="shrink-0 text-[10px] text-muted-foreground transition-transform group-open:rotate-45">
+                  <Plus size={14} />
+                </span>
               </summary>
-              <p className="px-5 pb-5 text-sm leading-relaxed text-muted-foreground">
+              <p className="px-5 pb-4 text-[13px] leading-relaxed text-muted-foreground">
                 {faq.a}
               </p>
             </details>
@@ -763,111 +870,128 @@ const FAQ: FC = () => {
   );
 };
 
-/* ── CTA Final ── */
-const CTAFinal: FC = () => {
+/* ─────────────────────────────────────────────
+   Waitlist CTA
+   ──────────────────────────────────────────── */
+
+const WaitlistCTA: FC = () => {
   return (
     <section
-      id="cta"
-      className="mx-6 mb-24 overflow-hidden rounded-3xl bg-brand/8 md:mx-auto md:max-w-5xl"
+      id="waitlist"
+      className="mx-6 mb-24 md:mx-auto md:max-w-4xl"
     >
-      <div className="flex flex-col items-center gap-6 px-8 py-16 text-center md:py-24">
-        <h2 className="text-balance font-heading text-[clamp(1.5rem,3vw,2.5rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
-          Start building your portfolio.
-          <br />
-          <span className="text-brand">It&apos;s free.</span>
-        </h2>
-        <p className="max-w-md text-sm text-muted-foreground">
-          No wallet required. Simulated portfolios only. Jump in and start
-          competing in under a minute.
-        </p>
+      <div className="relative overflow-hidden rounded-2xl border border-brand/15 bg-brand/[0.04]">
+        {/* Subtle grid texture — only here, not decorative */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage:
+              "linear-gradient(oklch(0.7 0.22 150) 1px, transparent 1px), linear-gradient(90deg, oklch(0.7 0.22 150) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
 
-        {/* Visual-only signup form */}
-        <div className="mt-2 flex w-full max-w-md flex-col gap-3 sm:flex-row">
-          <input
-            type="text"
-            placeholder="Your nickname or email"
-            disabled
-            className="h-12 flex-1 rounded-full border border-border/20 bg-card/50 px-5 text-sm text-muted-foreground placeholder:text-muted-foreground/40 disabled:cursor-not-allowed"
-          />
-          <button
-            disabled
-            className="inline-flex h-12 items-center gap-2 rounded-full bg-brand px-8 text-sm font-semibold text-brand-foreground opacity-60 disabled:cursor-not-allowed"
-          >
-            Get started
-            <ArrowRight size={16} />
-          </button>
-        </div>
-        <p className="text-xs text-muted-foreground/40">
-          The form is visual only — signups will be available at launch.
-        </p>
+        <div className="relative flex flex-col items-center gap-5 px-6 py-16 text-center md:py-20">
+          <div className="mb-1">
+            <LogoMark size={48} className="text-brand" />
+          </div>
+          <h2 className="text-balance font-heading text-[clamp(1.5rem,3vw,2.5rem)] leading-[1.15] font-semibold tracking-[-0.02em]">
+            Be the first
+            <br />
+            <span className="text-brand">on the leaderboard.</span>
+          </h2>
+          <p className="max-w-md text-sm leading-relaxed text-muted-foreground">
+            Hoodfolio is in active development. Join the waitlist for early
+            access, launch updates, and a head start on the competition.
+          </p>
 
-        {/* Player count */}
-        <div className="mt-4 flex items-center gap-2 rounded-full border border-border/15 bg-card/30 px-4 py-1.5">
-          <Users size={14} className="text-muted-foreground" />
-          <span className="font-mono text-xs text-muted-foreground">
-            Early access — limited spots available at launch
-          </span>
+          {/* Visual-only form */}
+          <div className="mt-2 flex w-full max-w-md flex-col gap-3 sm:flex-row">
+            <div className="flex h-12 flex-1 items-center rounded-full border border-border/15 bg-card/40 px-5">
+              <span className="text-sm text-muted-foreground/40">
+                your@email.com
+              </span>
+            </div>
+            <button
+              disabled
+              className="inline-flex h-12 items-center gap-2 rounded-full bg-brand px-7 text-sm font-semibold text-brand-foreground opacity-50"
+            >
+              Notify me
+              <ArrowRight size={15} />
+            </button>
+          </div>
+
+          <div className="flex flex-col items-center gap-3">
+            <p className="font-mono text-[11px] text-muted-foreground/40">
+              MVP launching soon · No wallet required · Simulated portfolios
+            </p>
+            <ComingSoonBadge />
+          </div>
         </div>
       </div>
     </section>
   );
 };
 
-/* ── Footer ── */
+/* ─────────────────────────────────────────────
+   Footer
+   ──────────────────────────────────────────── */
+
 const Footer: FC = () => {
   return (
-    <footer className="border-t border-border/20 px-6 py-12">
+    <footer className="border-t border-border/15 px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 text-center md:flex-row md:justify-between md:text-left">
-        <div className="flex flex-col gap-1">
-          <a href="#" className="flex items-center justify-center gap-2 font-heading font-bold md:justify-start">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-brand text-brand-foreground font-mono text-xs font-bold">
-              H
-            </span>
-            Hoodfolio
-          </a>
-          <p className="text-xs text-muted-foreground">
-            Fantasy Stock Token Trading Game. Built for Robinhood Chain.
+        <div className="flex flex-col items-center gap-2 md:items-start">
+          <Logo className="text-base" />
+          <p className="text-[12px] text-muted-foreground">
+            Fantasy Stock Token Trading · Built for Robinhood Chain
           </p>
         </div>
 
-        <div className="flex items-center gap-6 text-sm">
+        <div className="flex items-center gap-5">
           <a
             href="https://x.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+            className="flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
           >
-            X / Twitter
-            <ExternalLink size={12} />
+            X
+            <ExternalLink size={11} />
           </a>
           <a
             href="https://discord.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+            className="flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
           >
             Discord
-            <ExternalLink size={12} />
+            <ExternalLink size={11} />
           </a>
+          <span className="text-[13px] text-muted-foreground/40">
+            © Hoodfolio
+          </span>
         </div>
       </div>
     </footer>
   );
 };
 
-/* ── Main Page ── */
+/* ─────────────────────────────────────────────
+   Page
+   ──────────────────────────────────────────── */
+
 export default function HomePage() {
   return (
     <>
       <Nav />
       <main>
         <Hero />
-        <Contrast />
-        <HowItWorks />
-        <Competitions />
+        <WhyDifferent />
+        <CompetitionsTimeline />
+        <LeaderboardSection />
         <WhyRHChain />
         <FAQ />
-        <CTAFinal />
+        <WaitlistCTA />
       </main>
       <Footer />
     </>

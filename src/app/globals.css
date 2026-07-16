@@ -26,12 +26,16 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  /* Brand tokens */
   --color-brand: var(--brand);
   --color-brand-dim: var(--brand-dim);
+  --color-brand-light: var(--brand-light);
   --color-brand-foreground: var(--brand-foreground);
+  /* Semantic */
   --color-positive: var(--positive);
   --color-negative: var(--negative);
-  --color-amber: var(--amber);
+  --color-gold: var(--gold);
+  /* Radius scale */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -40,39 +44,40 @@
 }
 
 :root {
-  /* Hoodfolio palette — dark mode only (the product IS dark) */
-  /* bg-primary: near-black with slight violet undertone */
-  --background: oklch(0.08 0.009 260);
+  /* ── Base surfaces ── */
+  --background: oklch(0.07 0.007 255);
   --foreground: oklch(0.95 0 0);
-  --card: oklch(0.12 0.008 260);
+  --card: oklch(0.11 0.006 255);
   --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.12 0.008 260);
+  --popover: oklch(0.11 0.006 255);
   --popover-foreground: oklch(0.95 0 0);
 
-  /* Brand: electric green — sports-field under floodlights */
-  --brand: oklch(0.73 0.22 145);
-  --brand-dim: oklch(0.55 0.14 145);
-  --brand-foreground: oklch(0.08 0.009 260);
+  /* ── Brand: Robinhood-inspired green ── */
+  /* Shifted toward RH's iconic green (hue ~150), kept vibrant & electric */
+  --brand: oklch(0.70 0.22 150);
+  --brand-dim: oklch(0.52 0.14 150);
+  --brand-light: oklch(0.82 0.12 150);
+  --brand-foreground: oklch(0.07 0.007 255);
 
+  /* ── UI primitives ── */
   --primary: oklch(0.95 0 0);
-  --primary-foreground: oklch(0.08 0.009 260);
-  --secondary: oklch(0.16 0.008 260);
+  --primary-foreground: oklch(0.07 0.007 255);
+  --secondary: oklch(0.15 0.006 255);
   --secondary-foreground: oklch(0.92 0 0);
-  --muted: oklch(0.16 0.008 260);
-  --muted-foreground: oklch(0.62 0.01 260);
+  --muted: oklch(0.15 0.006 255);
+  --muted-foreground: oklch(0.58 0.008 255);
 
-  /* Amber for winners/highlights */
-  --amber: oklch(0.78 0.15 85);
+  /* ── Semantic ── */
+  --gold: oklch(0.75 0.15 85);
+  --positive: oklch(0.60 0.17 150);
+  --negative: oklch(0.54 0.19 22);
 
-  --positive: oklch(0.64 0.18 145);
-  --negative: oklch(0.55 0.19 22);
-
-  --accent: oklch(0.73 0.22 145 / 12%);
-  --accent-foreground: oklch(0.73 0.22 145);
-  --destructive: oklch(0.55 0.19 22);
-  --border: oklch(0.95 0 0 / 10%);
-  --input: oklch(0.95 0 0 / 12%);
-  --ring: oklch(0.73 0.22 145);
+  --accent: oklch(0.70 0.22 150 / 10%);
+  --accent-foreground: oklch(0.70 0.22 150);
+  --destructive: oklch(0.54 0.19 22);
+  --border: oklch(0.95 0 0 / 8%);
+  --input: oklch(0.95 0 0 / 10%);
+  --ring: oklch(0.70 0.22 150);
   --radius: 0.5rem;
 }
 
@@ -91,7 +96,6 @@
     scroll-behavior: smooth;
   }
 
-  /* Reduced motion: drop all animations */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -106,7 +110,6 @@
   }
 }
 
-/* Utility for text balance */
 @utility text-balance {
   text-wrap: balance;
 }
