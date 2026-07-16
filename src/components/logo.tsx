@@ -7,8 +7,8 @@ interface LogoProps {
 
 /**
  * Hoodfolio logo mark.
- * A hexagon (subtle blockchain reference) containing a stylized "H"
- * formed by two vertical bars and an upward-diagonal crossbar
+ * A hexagon containing a stylized "H" with two vertical bars
+ * and a horizontal crossbar with an upward arrow tip
  * (chart/candlestick motif), in Robinhood-inspired green.
  */
 export const LogoMark: FC<LogoProps> = ({ size = 32, className = "" }) => (
@@ -21,7 +21,7 @@ export const LogoMark: FC<LogoProps> = ({ size = 32, className = "" }) => (
     className={className}
     aria-label="Hoodfolio"
   >
-    {/* Hexagon background */}
+    {/* Hexagon */}
     <path
       d="M16 1L29.5 8.5V23.5L16 31L2.5 23.5V8.5L16 1Z"
       fill="currentColor"
@@ -29,20 +29,22 @@ export const LogoMark: FC<LogoProps> = ({ size = 32, className = "" }) => (
       stroke="currentColor"
       strokeWidth="1.2"
     />
-    {/* H left bar */}
-    <rect x="9" y="8" width="2.5" height="16" rx="1" fill="currentColor" />
-    {/* H right bar */}
-    <rect x="20.5" y="8" width="2.5" height="16" rx="1" fill="currentColor" />
-    {/* H crossbar — upward diagonal (chart motif) */}
+    {/* H left vertical bar */}
+    <rect x="8" y="7.5" width="2.4" height="17" rx="1.2" fill="currentColor" />
+    {/* H right vertical bar */}
+    <rect x="21.6" y="7.5" width="2.4" height="17" rx="1.2" fill="currentColor" />
+    {/* H horizontal crossbar */}
+    <rect x="10.4" y="15" width="8.5" height="2" rx="1" fill="currentColor" />
+    {/* Upward arrow from crossbar (chart motif) */}
     <path
-      d="M11 20L15 15L18 17L21 12"
+      d="M18 16L22 10"
       stroke="currentColor"
-      strokeWidth="2.5"
+      strokeWidth="2.2"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Small dot at the end — price target */}
-    <circle cx="21" cy="12" r="2" fill="currentColor" />
+    {/* Arrow tip at the end */}
+    <circle cx="22" cy="10" r="1.6" fill="currentColor" />
   </svg>
 );
 
