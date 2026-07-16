@@ -8,12 +8,10 @@ import {
   BookOpen,
   Compass,
   Swords,
-  Cpu,
   Telescope,
   Menu,
   X,
   ArrowLeft,
-  ArrowUpRight,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 
@@ -33,11 +31,6 @@ const SECTIONS = [
     href: "/docs/competition-system",
     label: "Competition System",
     icon: <Swords size={16} />,
-  },
-  {
-    href: "/docs/technology",
-    label: "Technology",
-    icon: <Cpu size={16} />,
   },
   {
     href: "/docs/vision",
