@@ -357,10 +357,15 @@ const Hero: FC = () => {
         transition={{ delay: 0.8 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2"
       >
-        <ChevronDown
-          size={20}
-          className="animate-bounce text-muted-foreground/30"
-        />
+        <motion.div
+          animate={{ y: [0, 6, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ChevronDown
+            size={20}
+            className="text-muted-foreground/30"
+          />
+        </motion.div>
       </motion.div>
     </section>
   );
