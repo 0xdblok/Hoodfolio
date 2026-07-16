@@ -176,6 +176,12 @@ const Nav: FC = () => {
             Leaderboard
           </a>
           <a
+            href="/docs"
+            className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Docs
+          </a>
+          <a
             href="#faq"
             className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
           >
@@ -226,6 +232,13 @@ const Nav: FC = () => {
               onClick={() => setOpen(false)}
             >
               Leaderboard
+            </a>
+            <a
+              href="/docs"
+              className="text-sm text-muted-foreground"
+              onClick={() => setOpen(false)}
+            >
+              Docs
             </a>
             <a
               href="#faq"
@@ -966,6 +979,12 @@ const Footer: FC = () => {
           >
             Discord
             <ExternalLink size={11} />
+          </a>
+          <a
+            href="/docs"
+            className="flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Docs
           </a>
           <span className="text-[13px] text-muted-foreground/40">
             © Hoodfolio
