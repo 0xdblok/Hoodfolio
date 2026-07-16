@@ -77,7 +77,7 @@ const FAQS = [
   },
   {
     q: "Is it free to play?",
-    a: "Completely free during the MVP. You'll use simulated portfolios with virtual currency called DOL. No real money, no wallet required — just sign up and start competing.",
+    a: "Completely free. You'll use simulated portfolios with virtual currency called DOL. No real money, no wallet required — just sign up and start competing.",
   },
   {
     q: "How do competitions work?",
@@ -85,7 +85,7 @@ const FAQS = [
   },
   {
     q: "What assets can I pick?",
-    a: "The MVP features a curated set of major stocks and cryptocurrencies. You pick exactly five assets per portfolio. As the platform grows, more assets — including Robinhood Stock Tokens — will be added.",
+    a: "The platform features a curated set of major stocks and cryptocurrencies. You pick exactly five assets per portfolio. As the platform grows, more assets — including Robinhood Stock Tokens — will be added.",
   },
   {
     q: "What is Robinhood Chain?",
@@ -93,11 +93,11 @@ const FAQS = [
   },
   {
     q: "Do I need a crypto wallet?",
-    a: "Not during the MVP. Simulated portfolios mean you can play immediately. Wallet integration and real tokenized assets will be introduced when the Robinhood Chain ecosystem matures.",
+    a: "No. Simulated portfolios mean you can play immediately. Wallet integration and real tokenized assets will be introduced when the Robinhood Chain ecosystem matures.",
   },
   {
     q: "When is the launch?",
-    a: "We're in active development. The MVP is targeted for release soon. Join the waitlist to get early access and secure your spot in the first competitions.",
+    a: "We're in active development. The platform is coming soon. Join the waitlist to get early access and secure your spot in the first competitions.",
   },
 ];
 
@@ -352,6 +352,36 @@ const Hero: FC = () => {
       {/* Ambient brand glow */}
       <div className="pointer-events-none absolute top-1/3 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand/5 blur-[140px]" />
 
+      {/* Left green accent bar */}
+      <motion.div
+        initial={{ opacity: 0, x: -40 }}
+        animate={{ opacity: 0.5, x: 0 }}
+        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="pointer-events-none absolute top-1/2 left-8 hidden h-48 w-px -translate-y-1/2 bg-gradient-to-b from-transparent via-brand to-transparent md:block"
+      />
+      {/* Right green accent bar */}
+      <motion.div
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 0.5, x: 0 }}
+        transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        className="pointer-events-none absolute top-1/2 right-8 hidden h-48 w-px -translate-y-1/2 bg-gradient-to-b from-transparent via-brand to-transparent md:block"
+      />
+
+      {/* Top-left green glow orb */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.08 }}
+        transition={{ duration: 1.5, delay: 0.4 }}
+        className="pointer-events-none absolute top-10 left-[-10%] h-[300px] w-[300px] rounded-full bg-brand blur-[100px] md:left-[-5%] md:h-[400px] md:w-[400px]"
+      />
+      {/* Bottom-right green glow orb */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.06 }}
+        transition={{ duration: 1.5, delay: 0.6 }}
+        className="pointer-events-none absolute right-[-10%] bottom-10 h-[250px] w-[250px] rounded-full bg-brand blur-[100px] md:right-[-5%] md:h-[350px] md:w-[350px]"
+      />
+
       {/* Logo mark — large, subtle */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -433,7 +463,7 @@ const Hero: FC = () => {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
           </span>
           <span className="font-mono text-[11px] text-muted-foreground">
-            MVP in development · Early access opening soon
+            Coming soon · Follow us on 𝕏 for updates
           </span>
         </motion.div>
       </div>
@@ -821,7 +851,7 @@ const WhyRHChain: FC = () => {
         </h2>
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground">
           Hoodfolio is designed to showcase what tokenized stock trading makes
-          possible — competitive, social, and verifiable. The MVP runs with
+          possible — competitive, social, and verifiable. The platform currently runs with
           simulated portfolios; Robinhood Chain integration is the target
           ecosystem.
         </p>
@@ -936,7 +966,7 @@ const WaitlistCTA: FC = () => {
 
           <div className="flex flex-col items-center gap-3">
             <p className="font-mono text-[11px] text-muted-foreground/40">
-              MVP launching soon · No wallet required · Simulated portfolios
+              Coming soon · No wallet required · Simulated portfolios
             </p>
             <ComingSoonBadge />
           </div>
@@ -968,16 +998,7 @@ const Footer: FC = () => {
             rel="noopener noreferrer"
             className="flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
           >
-            X
-            <ExternalLink size={11} />
-          </a>
-          <a
-            href="https://discord.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Discord
+            𝕏 Follow us on Twitter
             <ExternalLink size={11} />
           </a>
           <a
